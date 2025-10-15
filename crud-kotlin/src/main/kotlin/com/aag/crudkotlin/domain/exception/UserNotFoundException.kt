@@ -1,4 +1,4 @@
-package com.aag.crudkotlin.exceptions
+package com.aag.crudkotlin.domain.exception
 
 import java.lang.RuntimeException
 

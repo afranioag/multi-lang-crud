@@ -1,4 +1,4 @@
-package com.aag.crudkotlin.entities
+package com.aag.crudkotlin.domain.entity
 
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue

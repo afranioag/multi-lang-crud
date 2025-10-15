@@ -1,6 +1,6 @@
-package com.aag.crudkotlin.dtos
+package com.aag.crudkotlin.application.dto.request
 
-data class AddressDto (
+data class AddressRequest (
     val id: Long,
     val dressCode: String,
     val street: String,

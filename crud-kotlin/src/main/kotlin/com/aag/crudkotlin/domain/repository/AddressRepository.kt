@@ -1,6 +1,6 @@
-package com.aag.crudkotlin.repositories
+package com.aag.crudkotlin.domain.repository
 
-import com.aag.crudkotlin.entities.Address
+import com.aag.crudkotlin.domain.entity.Address
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
