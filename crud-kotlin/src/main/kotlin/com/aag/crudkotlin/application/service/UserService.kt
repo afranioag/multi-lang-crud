@@ -4,7 +4,9 @@ import com.aag.crudkotlin.application.dto.request.AddressRequest
 import com.aag.crudkotlin.application.dto.request.UserRequest
 import com.aag.crudkotlin.application.dto.response.UserResponse
 import com.aag.crudkotlin.domain.entity.User
+import com.aag.crudkotlin.domain.entity.UserProfile
 import com.aag.crudkotlin.domain.exception.AddressNotFoundException
+import com.aag.crudkotlin.domain.exception.InvalidPasswordException
 import com.aag.crudkotlin.domain.exception.ObjectAlreadyExistsException
 import com.aag.crudkotlin.domain.exception.UserNotFoundException
 import com.aag.crudkotlin.domain.repository.UserRepository
@@ -15,12 +17,18 @@ import org.springframework.transaction.annotation.Transactional
 class UserService (private val userRepository: UserRepository,
     private val addressService: AddressService) {
 
-    fun creatUser (userRequest: UserRequest) : User {
+    fun creatUser (userRequest: UserRequest) : UserResponse {
+
+        isPasswordValid(userRequest.password)
+
         if(userRepository.existsByDocument(userRequest.document)) {
             throw ObjectAlreadyExistsException("User with document ${userRequest.document} already exists!")
         }
 
         var user = User (
+            email = userRequest.email,
+            password = userRequest.password,
+            role = UserProfile.SIMPLE,
             name = userRequest.name,
             age = userRequest.age,
             document = userRequest.document
@@ -32,7 +40,7 @@ class UserService (private val userRepository: UserRepository,
             addressService.save(userRequest.address, user)
         }
 
-        return user;
+        return UserResponse(user.id!!, user.name, user.age, user.document, emptyList());
     }
 
     fun getUser(id: Long): UserResponse {
@@ -61,7 +69,7 @@ class UserService (private val userRepository: UserRepository,
 
     @Transactional
     fun updateUser(id: Long, userRequest: UserRequest) {
-        var user = userRepository.findById(id)
+        val user = userRepository.findById(id)
             .orElseThrow {UserNotFoundException("User whit id $id not found!")};
 
         user.name = userRequest.name
@@ -98,5 +106,13 @@ class UserService (private val userRepository: UserRepository,
 
         userRepository.save(user)
 
+    }
+
+    fun isPasswordValid(password: String) {
+        val passwordRegex = "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{6,}$".toRegex()
+
+        if (!passwordRegex.matches(password)) {
+            throw InvalidPasswordException("Password invalid!")
+        }
     }
 }

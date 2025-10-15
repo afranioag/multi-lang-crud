@@ -16,7 +16,7 @@ class UserController(
 ) {
 
     @PostMapping
-    fun create(@RequestBody user: UserRequest): User {
+    fun create(@RequestBody user: UserRequest): UserResponse {
         return userService.creatUser(user)
     }
 
