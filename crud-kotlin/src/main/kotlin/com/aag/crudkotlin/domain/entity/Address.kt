@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 
 @Entity
@@ -21,7 +22,8 @@ data class Address (
     val city: String,
     val state: String,
     val country: String,
-    @ManyToOne
+
+    @OneToOne
     @JoinColumn(name = "user_id")
-    val user: User
+    var user: User? = null
 )

@@ -18,7 +18,7 @@ data class User (
     var password: String,
 
     @Enumerated(EnumType.STRING)
-    val role: UserProfile,
+    val role: UserRole,
 
     @Column(nullable = false)
     var name: String,
@@ -29,6 +29,9 @@ data class User (
     @Column(nullable = false, unique = true)
     var document: String,
 
-    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], fetch = FetchType.LAZY, orphanRemoval = true)
-    val addresses: MutableList<Address> = mutableListOf()
+    @OneToOne(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    var address: Address? = null,
+
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val books: MutableList<Book> = mutableListOf()
 )

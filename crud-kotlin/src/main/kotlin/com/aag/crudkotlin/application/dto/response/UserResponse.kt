@@ -7,5 +7,5 @@ data class UserResponse(
     val name: String,
     val age: Int,
     val document: String,
-    val addresses: List<AddressRequest>
+    val address: AddressResponse? = null,
 )

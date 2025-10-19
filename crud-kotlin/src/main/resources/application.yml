@@ -21,9 +21,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
-server:
-  port: 8080
+jwt:
+  secret: minha-super-secret-key-muito-segura-para-jwt-token-authentication-2024
+  expiration: 8400000
 
 # Configuração da API de CEP
 cep:

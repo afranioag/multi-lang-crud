@@ -4,7 +4,7 @@ import com.aag.crudkotlin.application.dto.request.AddressRequest
 import com.aag.crudkotlin.application.dto.request.UserRequest
 import com.aag.crudkotlin.application.dto.response.UserResponse
 import com.aag.crudkotlin.domain.entity.User
-import com.aag.crudkotlin.domain.entity.UserProfile
+import com.aag.crudkotlin.domain.entity.UserRole
 import com.aag.crudkotlin.domain.exception.AddressNotFoundException
 import com.aag.crudkotlin.domain.exception.InvalidPasswordException
 import com.aag.crudkotlin.domain.exception.ObjectAlreadyExistsException
@@ -28,7 +28,7 @@ class UserService (private val userRepository: UserRepository,
         var user = User (
             email = userRequest.email,
             password = userRequest.password,
-            role = UserProfile.SIMPLE,
+            role = UserRole.SIMPLE,
             name = userRequest.name,
             age = userRequest.age,
             document = userRequest.document
@@ -40,30 +40,18 @@ class UserService (private val userRepository: UserRepository,
             addressService.save(userRequest.address, user)
         }
 
-        return UserResponse(user.id!!, user.name, user.age, user.document, emptyList());
+        return UserResponse(user.id!!, user.name, user.age, user.document);
     }
 
     fun getUser(id: Long): UserResponse {
         val user = userRepository.findById(id)
-            .orElseThrow { UserNotFoundException("Usuário com id $id não encontrado") }
+            .orElseThrow { UserNotFoundException("User whit id $id not found!") }
 
         return UserResponse(
             id = user.id!!,
             name = user.name,
             age = user.age,
-            document = user.document,
-            addresses = user.addresses.map { address ->
-                AddressRequest(
-                    id = address.id!!,
-                    dressCode = address.dressCode,
-                    street = address.street,
-                    number = address.number,
-                    complement = address.complement,
-                    city = address.city,
-                    state = address.state,
-                    country = address.country
-                )
-            }
+            document = user.document
         )
     }
 
@@ -88,24 +76,6 @@ class UserService (private val userRepository: UserRepository,
     @Transactional
     fun remove(id: Long) {
         userRepository.deleteById(id);
-    }
-
-    @Transactional
-    fun removeAddress(userId: Long, addressId: Long) {
-        val user = userRepository.findById(userId)
-            .orElseThrow {UserNotFoundException("User whit id $userId not found!")};
-
-        user.addresses.find { it.id == addressId }
-            ?: throw UserNotFoundException("Address whit id $addressId not found for user with id $userId")
-
-        val addressRemoved = user.addresses.removeIf { it.id == addressId }
-
-        if (!addressRemoved) {
-            throw AddressNotFoundException("Address whit id $addressId not removed!")
-        }
-
-        userRepository.save(user)
-
     }
 
     fun isPasswordValid(password: String) {
