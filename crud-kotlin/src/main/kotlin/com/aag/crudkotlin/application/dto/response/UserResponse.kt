@@ -1,11 +1,9 @@
 package com.aag.crudkotlin.application.dto.response
 
-import com.aag.crudkotlin.application.dto.request.AddressRequest
-
 data class UserResponse(
-    val id: Long,
-    val name: String,
-    val age: Int,
-    val document: String,
-    val address: AddressResponse? = null,
+    var id: Long,
+    var name: String,
+    var age: Int,
+    var document: String,
+    var address: AddressResponse? = null,
 )

@@ -5,5 +5,5 @@ data class BookResponse (
     var author: String,
     var description: String? = null,
     var genre: String? = null,
-    var edition: Int,
+    var edition: Int? = null,
 )

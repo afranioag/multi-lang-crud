@@ -9,6 +9,7 @@ import com.aag.crudkotlin.domain.exception.BookNotFoundException
 import com.aag.crudkotlin.domain.exception.UserNotFoundException
 import com.aag.crudkotlin.domain.repository.BookRepository
 import com.aag.crudkotlin.domain.repository.UserRepository
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -48,7 +49,7 @@ class BookService(val bookRepository: BookRepository,
 
     fun getBook(email: String, id: Long): BookResponse {
         val book = bookRepository.findByIdAndUserEmail(id, email)
-            .orElseThrow { BookNotFoundException("Book with id $id not found!") }
+            .orElseThrow { BookNotFoundException("Book with id $id not found!")}
 
         return BookResponse(
             title = book.title,
@@ -59,27 +60,11 @@ class BookService(val bookRepository: BookRepository,
         )
     }
 
-    fun gelAllBooks(email: String, pageNumber: Int, itemsPerPage: Int): PageResponse<BookResponse> {
+    fun gelMyAllBooks(email: String, pageNumber: Int, itemsPerPage: Int): PageResponse<BookResponse> {
 
         val pageable: Pageable = Pageable.ofSize(itemsPerPage).withPage(pageNumber);
         val page = bookRepository.findAllByUserEmail(email, pageable)
-
-        val responses = page.content.stream().map { book -> BookResponse(
-            title = book.title,
-            author = book.author,
-            description = book.description,
-            genre = book.genre,
-            edition = book.edition,
-        ) }.collect(Collectors.toList())
-
-        return PageResponse(
-            totalPages = page.totalPages,
-            totalElements = page.totalElements,
-            size = page.size,
-            pageNumber = page.number,
-            numberOfElements = page.numberOfElements,
-            content = responses
-        )
+        return buildBooksPage(page)
     }
 
     @Transactional
@@ -97,5 +82,32 @@ class BookService(val bookRepository: BookRepository,
         }
 
         userRepository.save(user)
+    }
+
+    // ROTAS PARA ADMIN
+    fun gelAllBooks(pageNumber: Int, itemsPerPage: Int): PageResponse<BookResponse> {
+
+        val pageable: Pageable = Pageable.ofSize(itemsPerPage).withPage(pageNumber);
+        val page = bookRepository.findAll(pageable)
+        return buildBooksPage(page)
+    }
+
+    fun buildBooksPage(page: Page<Book>) : PageResponse<BookResponse> {
+        val responses = page.content.stream().map { book -> BookResponse(
+            title = book.title,
+            author = book.author,
+            description = book.description,
+            genre = book.genre,
+            edition = book.edition,
+        ) }.collect(Collectors.toList())
+
+        return PageResponse(
+            totalPages = page.totalPages,
+            totalElements = page.totalElements,
+            size = page.size,
+            pageNumber = page.number,
+            numberOfElements = page.numberOfElements,
+            content = responses
+        )
     }
 }

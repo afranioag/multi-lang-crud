@@ -3,6 +3,7 @@ package com.aag.crudkotlin.presentation.handler
 
 import com.aag.crudkotlin.domain.exception.AddressNotFoundException
 import com.aag.crudkotlin.domain.exception.BookNotFoundException
+import com.aag.crudkotlin.domain.exception.ForbiddenException
 import com.aag.crudkotlin.domain.exception.InvalidCredentialsException
 import com.aag.crudkotlin.domain.exception.InvalidPasswordException
 import com.aag.crudkotlin.domain.exception.ObjectAlreadyExistsException
@@ -89,6 +90,15 @@ class GlobalExceptionHandler {
         val error = ErrorResponse(
             status = HttpStatus.BAD_REQUEST.value(),
             message = "Invalid Json. Necessary camps is blank or null"
+        )
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error)
+    }
+
+    @ExceptionHandler(ForbiddenException::class)
+    fun handleForbidden(ex: ForbiddenException): ResponseEntity<ErrorResponse> {
+        val error = ErrorResponse(
+            status = HttpStatus.BAD_REQUEST.value(),
+            message = "Forbidden. You don't have permission to access this resource!"
         )
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error)
     }

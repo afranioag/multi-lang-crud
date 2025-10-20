@@ -11,15 +11,6 @@ data class User (
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column(nullable = false, unique = true)
-    val email: String,
-
-    @Column(name = "password")
-    var password: String,
-
-    @Enumerated(EnumType.STRING)
-    val role: UserRole,
-
     @Column(nullable = false)
     var name: String,
 
@@ -33,5 +24,14 @@ data class User (
     var address: Address? = null,
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val books: MutableList<Book> = mutableListOf()
+    val books: MutableList<Book> = mutableListOf(),
+
+    @Column(nullable = false, unique = true)
+    val email: String,
+
+    @Column(name = "password")
+    var password: String,
+
+    @Enumerated(EnumType.STRING)
+    val role: UserRole
 )

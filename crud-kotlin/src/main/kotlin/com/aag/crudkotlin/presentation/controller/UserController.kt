@@ -1,9 +1,13 @@
 package com.aag.crudkotlin.presentation.controller
 
-import com.aag.crudkotlin.application.dto.request.AddressRequest
 import com.aag.crudkotlin.application.dto.request.UserRequest
+import com.aag.crudkotlin.application.dto.response.BookResponse
+import com.aag.crudkotlin.application.dto.response.PageResponse
 import com.aag.crudkotlin.application.dto.response.UserResponse
+import com.aag.crudkotlin.application.service.AuthService
 import com.aag.crudkotlin.application.service.UserService
+import com.aag.crudkotlin.infrastructure.security.RequireAdmin
+import jakarta.servlet.http.HttpServletRequest
 import lombok.AllArgsConstructor
 import org.springframework.web.bind.annotation.*
 
@@ -11,7 +15,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/v1/users")
 @AllArgsConstructor
 class UserController(
-    private val userService: UserService
+    private val userService: UserService,
+    private val authService: AuthService
 ) {
 
     @PostMapping
@@ -20,22 +25,38 @@ class UserController(
     }
 
     @GetMapping("/{id}")
-    fun get(@PathVariable id: Long) : UserResponse {
+    fun get(
+        request: HttpServletRequest,
+        @PathVariable id: Long) : UserResponse {
+        authService.validateAuthorization(request, id)
         return userService.getUser(id);
     }
 
     @PutMapping("/{id}")
-    fun update(@PathVariable id: Long, @RequestBody userRequest: UserRequest) {
+    fun update(
+        request: HttpServletRequest,
+        @PathVariable id: Long,
+        @RequestBody userRequest: UserRequest) {
+        authService.validateAuthorization(request, id)
         userService.updateUser(id, userRequest);
     }
 
-    @PostMapping("{id}/address")
-    fun addAddress(@PathVariable id: Long, @RequestBody addressRequest: AddressRequest) {
-        userService.addAddress(id, addressRequest)
+    @DeleteMapping("/{id}")
+    fun delete(
+        request: HttpServletRequest,
+        @PathVariable id: Long)
+    {
+        authService.validateAuthorization(request, id)
+        userService.remove(id);
     }
 
-    @DeleteMapping("/{id}")
-    fun delete(@PathVariable id: Long) {
-        userService.remove(id);
+    @RequireAdmin
+    @GetMapping("/all")
+    fun getAllBooks(
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int
+    ): PageResponse<UserResponse> {
+
+        return userService.getAllUsers(page, size)
     }
 }

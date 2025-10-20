@@ -24,7 +24,7 @@ data class Book(
     var pages: Int? = null,
     var language: String? = null,
     var genre: String? = null,
-    var edition: Int,
+    var edition: Int? = null,
 
     @JsonIgnore
     @ManyToOne

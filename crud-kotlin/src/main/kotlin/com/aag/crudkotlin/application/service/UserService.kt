@@ -2,6 +2,8 @@ package com.aag.crudkotlin.application.service
 
 import com.aag.crudkotlin.application.dto.request.AddressRequest
 import com.aag.crudkotlin.application.dto.request.UserRequest
+import com.aag.crudkotlin.application.dto.response.AddressResponse
+import com.aag.crudkotlin.application.dto.response.PageResponse
 import com.aag.crudkotlin.application.dto.response.UserResponse
 import com.aag.crudkotlin.domain.entity.User
 import com.aag.crudkotlin.domain.entity.UserRole
@@ -10,8 +12,11 @@ import com.aag.crudkotlin.domain.exception.InvalidPasswordException
 import com.aag.crudkotlin.domain.exception.ObjectAlreadyExistsException
 import com.aag.crudkotlin.domain.exception.UserNotFoundException
 import com.aag.crudkotlin.domain.repository.UserRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.stream.Collectors
 
 @Service
 class UserService (private val userRepository: UserRepository,
@@ -36,11 +41,12 @@ class UserService (private val userRepository: UserRepository,
 
         user = userRepository.save(user)
 
+        val response = UserResponse(user.id!!, user.name, user.age, user.document)
         if(userRequest.address != null) {
-            addressService.save(userRequest.address, user)
+            response.address =  addressService.save(userRequest.address, user)
         }
 
-        return UserResponse(user.id!!, user.name, user.age, user.document);
+        return response
     }
 
     fun getUser(id: Long): UserResponse {
@@ -66,13 +72,6 @@ class UserService (private val userRepository: UserRepository,
         userRepository.save(user)
     }
 
-    fun addAddress(id: Long, addressRequest: AddressRequest) {
-        val user = userRepository.findById(id)
-            .orElseThrow {UserNotFoundException("User whit id $id not found!")};
-
-        addressService.save(addressRequest, user)
-    }
-
     @Transactional
     fun remove(id: Long) {
         userRepository.deleteById(id);
@@ -84,5 +83,23 @@ class UserService (private val userRepository: UserRepository,
         if (!passwordRegex.matches(password)) {
             throw InvalidPasswordException("Password invalid!")
         }
+    }
+
+    fun getAllUsers(pageNumber: Int, itemsPerPage: Int): PageResponse<UserResponse> {
+        val pageable: Pageable = Pageable.ofSize(itemsPerPage).withPage(pageNumber);
+        val page = userRepository.findAll(pageable)
+
+        val responses = page.content.stream().map { user -> UserResponse(user.id!!, user.name, user.age, user.document) }
+        .collect(Collectors.toList())
+
+        return PageResponse(
+            totalPages = page.totalPages,
+            totalElements = page.totalElements,
+            size = page.size,
+            pageNumber = page.number,
+            numberOfElements = page.numberOfElements,
+            content = responses
+        )
+
     }
 }
