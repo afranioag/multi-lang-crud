@@ -1,18 +1,14 @@
 package com.aag.crudkotlin.application.service
 
-import com.aag.crudkotlin.application.dto.request.AddressRequest
 import com.aag.crudkotlin.application.dto.request.UserRequest
-import com.aag.crudkotlin.application.dto.response.AddressResponse
 import com.aag.crudkotlin.application.dto.response.PageResponse
 import com.aag.crudkotlin.application.dto.response.UserResponse
 import com.aag.crudkotlin.domain.entity.User
 import com.aag.crudkotlin.domain.entity.UserRole
-import com.aag.crudkotlin.domain.exception.AddressNotFoundException
 import com.aag.crudkotlin.domain.exception.InvalidPasswordException
 import com.aag.crudkotlin.domain.exception.ObjectAlreadyExistsException
 import com.aag.crudkotlin.domain.exception.UserNotFoundException
 import com.aag.crudkotlin.domain.repository.UserRepository
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -41,7 +37,7 @@ class UserService (private val userRepository: UserRepository,
 
         user = userRepository.save(user)
 
-        val response = UserResponse(user.id!!, user.name, user.age, user.document)
+        val response = UserResponse(user.id!!, user.name,  email = user.email, user.age, user.document)
         if(userRequest.address != null) {
             response.address =  addressService.save(userRequest.address, user)
         }
@@ -56,6 +52,7 @@ class UserService (private val userRepository: UserRepository,
         return UserResponse(
             id = user.id!!,
             name = user.name,
+            email = user.email,
             age = user.age,
             document = user.document
         )
@@ -89,7 +86,7 @@ class UserService (private val userRepository: UserRepository,
         val pageable: Pageable = Pageable.ofSize(itemsPerPage).withPage(pageNumber);
         val page = userRepository.findAll(pageable)
 
-        val responses = page.content.stream().map { user -> UserResponse(user.id!!, user.name, user.age, user.document) }
+        val responses = page.content.stream().map { user -> UserResponse(user.id!!, user.name, email =user.email, user.age, user.document) }
         .collect(Collectors.toList())
 
         return PageResponse(

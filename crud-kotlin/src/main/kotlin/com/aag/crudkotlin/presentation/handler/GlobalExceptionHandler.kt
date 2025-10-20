@@ -19,59 +19,59 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException::class)
-    fun handleUserNotFound(ex: UserNotFoundException): ErrorResponse{
+    fun handleUserNotFound(ex: UserNotFoundException): ResponseEntity<ErrorResponse> {
         val error = ErrorResponse(
             status = HttpStatus.NOT_FOUND.value(),
             message = ex.message ?: "User not found!"
         )
-        return error;
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error)
     }
 
     @ExceptionHandler(AddressNotFoundException::class)
-    fun handleAddressNotFoundException(ex: AddressNotFoundException): ErrorResponse{
+    fun handleAddressNotFoundException(ex: AddressNotFoundException): ResponseEntity<ErrorResponse> {
         val error = ErrorResponse(
             status = HttpStatus.NOT_FOUND.value(),
             message = ex.message ?: "Address not found!"
         )
-        return error;
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error)
     }
 
     @ExceptionHandler(BookNotFoundException::class)
-    fun handleBookNotFoundException(ex: BookNotFoundException): ErrorResponse{
+    fun handleBookNotFoundException(ex: BookNotFoundException): ResponseEntity<ErrorResponse> {
         val error = ErrorResponse(
             status = HttpStatus.NOT_FOUND.value(),
             message = ex.message ?: "Book not found!"
         )
-        return error;
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error)
     }
 
 
     @ExceptionHandler(InvalidCredentialsException::class)
-    fun handleInvalidCredentialsException(ex: InvalidCredentialsException): ErrorResponse{
+    fun handleInvalidCredentialsException(ex: InvalidCredentialsException): ResponseEntity<ErrorResponse> {
         val error = ErrorResponse(
             status = HttpStatus.NOT_FOUND.value(),
             message = ex.message ?: "Invalid Credentials!"
         )
-        return error;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error)
     }
 
     @ExceptionHandler(InvalidPasswordException::class)
-    fun handleInvalidPasswordException(ex: InvalidPasswordException): ErrorResponse{
+    fun handleInvalidPasswordException(ex: InvalidPasswordException): ResponseEntity<ErrorResponse> {
         val error = ErrorResponse(
-            status = HttpStatus.NOT_FOUND.value(),
+            status = HttpStatus.BAD_REQUEST.value(),
             message = ex.message ?: "Invalid Password!"
         )
-        return error;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error)
     }
 
 
     @ExceptionHandler(ObjectAlreadyExistsException::class)
-    fun handleObjectAlreadyExistsException(ex: ObjectAlreadyExistsException): ErrorResponse{
+    fun handleObjectAlreadyExistsException(ex: ObjectAlreadyExistsException): ResponseEntity<ErrorResponse> {
         val error = ErrorResponse(
             status = HttpStatus.NOT_FOUND.value(),
             message = ex.message ?: "Object Already Exists!"
         )
-        return error;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error)
     }
 
     @ExceptionHandler(MethodArgumentNotValidException::class)

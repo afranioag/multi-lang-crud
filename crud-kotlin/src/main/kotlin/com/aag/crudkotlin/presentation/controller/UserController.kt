@@ -8,6 +8,7 @@ import com.aag.crudkotlin.application.service.AuthService
 import com.aag.crudkotlin.application.service.UserService
 import com.aag.crudkotlin.infrastructure.security.RequireAdmin
 import jakarta.servlet.http.HttpServletRequest
+import jakarta.validation.Valid
 import lombok.AllArgsConstructor
 import org.springframework.web.bind.annotation.*
 
@@ -20,7 +21,7 @@ class UserController(
 ) {
 
     @PostMapping
-    fun create(@RequestBody user: UserRequest): UserResponse {
+    fun create(@Valid @RequestBody user: UserRequest): UserResponse {
         return userService.creatUser(user)
     }
 
@@ -50,6 +51,7 @@ class UserController(
         userService.remove(id);
     }
 
+    // ROTA DE ADMIN
     @RequireAdmin
     @GetMapping("/all")
     fun getAllBooks(
